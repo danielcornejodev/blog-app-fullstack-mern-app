@@ -1,10 +1,21 @@
 const http = require('http');
 const fs = require('fs');
+const _ = require('lodash');
+
 
 //The callback arrow function fires whenever a webpage/browser sends a request to the server. req is an object that comes loaded with information such as the url requesting the info. Request type GET. 
 //res is what we use to send a response to the user. 
 const server = http.createServer((req, res) => {
-    console.log(req.url, req.method);
+    // lodash 
+    const num = _.random(0, 20);
+    console.log(num);
+
+    const greet = _.once(() => {
+        console.log('hello world');
+    });
+
+    greet();
+    greet();
 
     // set header content type
     res.setHeader('Content-Type', 'text/html');
@@ -14,12 +25,19 @@ const server = http.createServer((req, res) => {
     switch(req.url) {
         case '/':
             path += 'index.html';
+            res.statusCode = 200;
             break;
         case '/about':
             path += 'about.html';
+            res.statusCode = 200;
+            break;
+        case '/about-us':
+            res.setHeader('location', '/about');
+            res.statusCode = 301;
             break;
         default:
             path += '404.html';
+            res.statusCode = 404;
             break;
     }
 
@@ -27,6 +45,7 @@ const server = http.createServer((req, res) => {
     fs.readFile(path, (err, data) => {
             if (err) {
                 console.log(err);
+                res.end();
             } else {
                 // res.write(data);
                 // res.end();
