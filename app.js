@@ -4,6 +4,10 @@ const express = require('express');
 //invoking the function to create an instance of an express app framework
 const app = express();
 
+//register view engine. .set() allows us to configure app settings. 
+app.set('view engine', 'ejs');
+
+
 //listen for requests. You could store this in a const to reuse later in web sockets but not necessary. 
 app.listen(3000);
 
@@ -14,11 +18,12 @@ app.get('/', function (req, res) {
     //.send() is the same as .write() and .end() you were using previously in nodeJS. No need to write and end anymore, only .send() is needed. 
     //to send a file, you use the .sendFile method instead. By defualt looks for an absolute path. Be careful when using relative paths. 
     //second parameter is an object that specifices what realtive path is relative to. 
-    res.sendFile('./views/index.html', { root: __dirname });
+    //.render is using Express view engine and is much shorter syntax than .send 
+    res.render('index');
   });
 
   app.get('/about', function (req, res) {
-    res.sendFile('./views/about.html', { root: __dirname });
+    res.render('about');
   });
   
   //redirects
@@ -28,6 +33,6 @@ app.get('/', function (req, res) {
 
   //404 page. Like a "catch all". Since Express code runs from top to bottom until it finds a match, this code will only run if the code above is not a match. Whenever there is a match on a get handler, Express fires the callback function once and then stops. 
   app.use((req, res) => {
-    res.status(400).sendFile('./views/404.html', { root: __dirname });
+    res.status(400).render('404');
   })
 
