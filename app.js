@@ -15,6 +15,19 @@ app.get('/', function (req, res) {
     //to send a file, you use the .sendFile method instead. By defualt looks for an absolute path. Be careful when using relative paths. 
     //second parameter is an object that specifices what realtive path is relative to. 
     res.sendFile('./views/index.html', { root: __dirname });
-  })
+  });
+
+  app.get('/about', function (req, res) {
+    res.sendFile('./views/about.html', { root: __dirname });
+  });
   
+  //redirects
+  app.get('/about-us', (req, res) => {
+    res.redirect('/about');
+  })
+
+  //404 page. Like a "catch all". Since Express code runs from top to bottom until it finds a match, this code will only run if the code above is not a match. Whenever there is a match on a get handler, Express fires the callback function once and then stops. 
+  app.use((req, res) => {
+    res.status(400).sendFile('./views/404.html', { root: __dirname });
+  })
 
