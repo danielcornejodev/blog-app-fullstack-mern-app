@@ -1,1 +1,1 @@
-# node-crash-course
+# nodeJS-crash-course
