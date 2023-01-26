@@ -19,20 +19,30 @@ app.get('/', function (req, res) {
     //to send a file, you use the .sendFile method instead. By defualt looks for an absolute path. Be careful when using relative paths. 
     //second parameter is an object that specifices what realtive path is relative to. 
     //.render is using Express view engine and is much shorter syntax than .send 
-    res.render('index');
+    const blogs = [
+      {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+      {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+      {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+    ];
+    // if key and value are the same name you can condense. Example below blogs is condensed key value property. 
+    res.render('index', { title: 'Home' , blogs});
   });
 
   app.get('/about', function (req, res) {
-    res.render('about');
+    res.render('about', { title: 'About' });
+  });
+
+  app.get('/blogs/create', function (req, res) {
+    res.render('create', { title: 'Create a New Blog' });
   });
   
   //redirects
-  app.get('/about-us', (req, res) => {
-    res.redirect('/about');
-  })
+  // app.get('/about-us', (req, res) => {
+  //   res.redirect('/about');
+  // })
 
   //404 page. Like a "catch all". Since Express code runs from top to bottom until it finds a match, this code will only run if the code above is not a match. Whenever there is a match on a get handler, Express fires the callback function once and then stops. 
   app.use((req, res) => {
-    res.status(400).render('404');
+    res.status(400).render('404', { title: '404' });
   })
 
