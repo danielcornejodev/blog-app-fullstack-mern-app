@@ -8,21 +8,7 @@
 </head>
 <body>
     <!-- Input EJS syntax. Defined variable.  -->
-    <% const name = 'mario'  %>
-
-    <nav>
-        <div class="site-title">
-            <!-- output the EJS below -->
-            <p><%= name %></p>
-            <a href="/"><h1>Blog Ninja</h1></a>
-            <p>A New Ninja Site</p>
-        </div>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/blogs/create">Create New Blog</a></li>
-        </ul>
-    </nav>
+    <%- include('./partials/nav.ejs') %>
 
     <div class="blogs content">
         <h2>All Blogs</h2>
