@@ -1,6 +1,9 @@
 //returns a function that is stored in express
 const express = require('express');
 
+//Morgan
+const morgan = require('morgan');
+
 //invoking the function to create an instance of an express app framework
 const app = express();
 
@@ -10,6 +13,16 @@ app.set('view engine', 'ejs');
 
 //listen for requests. You could store this in a const to reuse later in web sockets but not necessary. 
 app.listen(3000);
+
+// middleware and static files (ex. CSS, images, that we will make public)
+//string passed into .static middleware method references your defined folder name that will be made vailable publically. 
+app.use(express.static('public'))
+
+//morgan function is invoked inside of use handler. Paramater inside Morgan function dictates an option. Defines how it is formatted when logged to console. 
+app.use(morgan('dev'));
+
+
+
 
 //first argument is path, second argument is a callback function function for request (ex: GET or POST) and response (ex: use to send a response)
 app.get('/', function (req, res) {
@@ -24,7 +37,7 @@ app.get('/', function (req, res) {
       {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
       {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
     ];
-    // if key and value are the same name you can condense. Example below blogs is condensed key value property. 
+    // First paramter in the render handler is the EJS file. if key and value are the same name you can condense. Example below blogs is condensed key value property. 
     res.render('index', { title: 'Home' , blogs});
   });
 
@@ -42,6 +55,8 @@ app.get('/', function (req, res) {
   // })
 
   //404 page. Like a "catch all". Since Express code runs from top to bottom until it finds a match, this code will only run if the code above is not a match. Whenever there is a match on a get handler, Express fires the callback function once and then stops. 
+  //.use handler runs for every type of request including POST requests. 
+  //.use for a 404 page  ALWAYS has to be at the bottom of your code block since Node/Express stops once response is set, is accepting of any type of request and other handlers further down in the code will never be reached.  
   app.use((req, res) => {
     res.status(400).render('404', { title: '404' });
   })
