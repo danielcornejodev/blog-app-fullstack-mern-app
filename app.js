@@ -4,24 +4,32 @@ const express = require('express');
 //Morgan
 const morgan = require('morgan');
 
+const mongoose = require('mongoose');
+
 //invoking the function to create an instance of an express app framework
 const app = express();
+
+//connect to MongoDB
+const dbURI = 'mongodb+srv://danielcornejodev:NKvdo2NaSBHFDlwn@cluster0.czuywlx.mongodb.net/node-tuts?retryWrites=true&w=majority';
+//connect method expects a connection string as an argument. Second argument is an options object. Second argument stops console deprecation warnings. 
+//.connect is an asyn task that takes some time to do. That is why .then is used. Then takes in a callback function that fires after connection is complete.
+//continue method chaining and tack on the .catch method to log any errors. 
+//listen for requests. You could store this in a const to reuse later in web sockets but not necessary. Listen moved to the the .then() method as it should not listen until after connecting to the DB. 
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then((result) => app.listen(3000))
+  .catch((err) => console.log(err));
 
 //register view engine. .set() allows us to configure app settings. 
 app.set('view engine', 'ejs');
 
 
-//listen for requests. You could store this in a const to reuse later in web sockets but not necessary. 
-app.listen(3000);
 
 // middleware and static files (ex. CSS, images, that we will make public)
-//string passed into .static middleware method references your defined folder name that will be made vailable publically. 
+//string passed into .static middleware as an argument references your defined folder name that will be made vailable publically. 
 app.use(express.static('public'))
 
 //morgan function is invoked inside of use handler. Paramater inside Morgan function dictates an option. Defines how it is formatted when logged to console. 
 app.use(morgan('dev'));
-
-
 
 
 //first argument is path, second argument is a callback function function for request (ex: GET or POST) and response (ex: use to send a response)
