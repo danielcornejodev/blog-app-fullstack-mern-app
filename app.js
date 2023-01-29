@@ -31,6 +31,9 @@ app.set('view engine', 'ejs');
 //string passed into .static middleware as an argument references your defined folder name that will be made vailable publically. 
 app.use(express.static('public'))
 
+//middleware converts data into a workable format so it can POST into the database. 
+app.use(express.urlencoded({ extended: true }));
+
 //morgan function is invoked inside of use handler. Paramater inside Morgan function dictates an option. Defines how it is formatted when logged to console. 
 app.use(morgan('dev'));
 
@@ -105,6 +108,21 @@ app.get('/', function (req, res) {
     Blog.find().sort({ createdAt: -1 })
       .then((result) => {
         res.render('index', { title: 'All Blogs', blogs: result })
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  })
+
+//middleware converts data into a workable format so it can POST into the database. otherwise would return undefined. 
+//app.use(express.urlencoded({ extended: true }));
+//.save() will save the req to the database. 
+  app.post('/blogs', (req, res) => {
+    const blog = new Blog(req.body);
+
+    blog.save()
+      .then((result) => {
+        res.redirect('/blogs')
       })
       .catch((err) => {
         console.log(err);
