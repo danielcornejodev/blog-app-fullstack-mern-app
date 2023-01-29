@@ -1,10 +1,12 @@
 //returns a function that is stored in express
 const express = require('express');
 
-//Morgan
+//Morgan is middleware
 const morgan = require('morgan');
 
 const mongoose = require('mongoose');
+
+const Blog = require('./models/blogs.js');
 
 //invoking the function to create an instance of an express app framework
 const app = express();
@@ -15,7 +17,8 @@ const dbURI = 'mongodb+srv://danielcornejodev:NKvdo2NaSBHFDlwn@cluster0.czuywlx.
 //.connect is an asyn task that takes some time to do. That is why .then is used. Then takes in a callback function that fires after connection is complete.
 //continue method chaining and tack on the .catch method to log any errors. 
 //listen for requests. You could store this in a const to reuse later in web sockets but not necessary. Listen moved to the the .then() method as it should not listen until after connecting to the DB. 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.set('strictQuery', true);
+mongoose.connect(dbURI)
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 
@@ -31,8 +34,51 @@ app.use(express.static('public'))
 //morgan function is invoked inside of use handler. Paramater inside Morgan function dictates an option. Defines how it is formatted when logged to console. 
 app.use(morgan('dev'));
 
+// mongoose and mongo sandbox routes. We are using the model to create a new instance of the blog document within the code.  
+//object inside the model should follow defined schema. 
+//We are using the save method on the instance of Blog model saved in const blog. Save method will save to the DB.
+//Async task. We are sending back result so we can see that in the broswer. Also tacking on a catch method for errors. 
+// app.get('/add-blog', (rew, res) => {
+//   const blog = new Blog({
+//     title: 'new blog 2',
+//     snippet: 'about my new blog',
+//     body: 'more about my new blog'
+//   })
+
+//   blog.save()
+//     .then((result) => {
+//       res.send(result)
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// })
+
+//find method will retrieve all of the documents inside of your model Collection. 
+//returns an array of objects.
+// app.get('/all-blogs', (req, res) => {
+//   Blog.find()
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     })
+// });
+
+
+// app.get('/single-blog', (req, res) => {
+//   Blog.findById("63d67c6e7383dfcde672b9e3")
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     })
+// })
 
 //first argument is path, second argument is a callback function function for request (ex: GET or POST) and response (ex: use to send a response)
+//routes
 app.get('/', function (req, res) {
     //.send method chooses header content type for you. No need to define anymore as you were doing in raw Nodejs. 
     //.send also infers the status code so you don't have to set manually.
@@ -40,18 +86,30 @@ app.get('/', function (req, res) {
     //to send a file, you use the .sendFile method instead. By defualt looks for an absolute path. Be careful when using relative paths. 
     //second parameter is an object that specifices what realtive path is relative to. 
     //.render is using Express view engine and is much shorter syntax than .send 
-    const blogs = [
-      {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-    ];
+    // const blogs = [
+    //   {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+    //   {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+    //   {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
+    // ];
     // First paramter in the render handler is the EJS file. if key and value are the same name you can condense. Example below blogs is condensed key value property. 
-    res.render('index', { title: 'Home' , blogs});
+    // res.render('index', { title: 'Home' , blogs});
+    res.redirect('/blogs');
   });
 
   app.get('/about', function (req, res) {
     res.render('about', { title: 'About' });
   });
+
+  //blog routes. You can sort by a key, the value -1 means in descending order (newest to oldest). 
+  app.get('/blogs', (req, res) => {
+    Blog.find().sort({ createdAt: -1 })
+      .then((result) => {
+        res.render('index', { title: 'All Blogs', blogs: result })
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  })
 
   app.get('/blogs/create', function (req, res) {
     res.render('create', { title: 'Create a New Blog' });
