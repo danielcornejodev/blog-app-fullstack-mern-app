@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 
 const Blog = require('./models/blogs.js');
+const { render } = require('ejs');
 
 //invoking the function to create an instance of an express app framework
 const app = express();
@@ -123,6 +124,19 @@ app.get('/', function (req, res) {
     blog.save()
       .then((result) => {
         res.redirect('/blogs')
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  })
+
+  //details is just the name of the view file you have just created in your views folder. then is ansync and returns a callback function 
+  // you can call the key anything but we are naming it blog and then value needs to be the result. title is defined and following schema. 
+  app.get('/blogs/:id', (req, res) => {
+    const id = req.params.id;
+    Blog.findById(id)
+      .then(result => {
+        res.render('details', { blog: result, title: 'Blog Details' });
       })
       .catch((err) => {
         console.log(err);
